@@ -53,6 +53,17 @@ Example:
 python main.py -s -a -fs
 ```
 
+### 5. View MLflow UI
+After running the pipeline, you can access the MLflow UI to monitor your experiments. Open your web browser and navigate to:
+
+```plaintext
+http://localhost:5001
+```
+> Note: The MLflow UI is accessible only when the Docker container is running. If you stop the container, the UI will no longer be available.
+
+Example of MLflow UI:
+<img src='example_mlflow.png' alt='MLflow UI Example' width='100%'/>
+
 ---
 
 ## 📊 Dataset Overview
