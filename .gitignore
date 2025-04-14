@@ -172,3 +172,8 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+app/data/*.zip
+app/data/*.tar.gz
+app/data/*.csv
+app/data/*.edf

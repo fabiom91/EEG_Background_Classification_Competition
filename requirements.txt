@@ -1,0 +1,5 @@
+mne
+pandas
+scipy
+antropy
+scikit-learn

@@ -1,0 +1,1 @@
+This folder stores the EEG data pulled from zenodo: https://zenodo.org/records/6587973

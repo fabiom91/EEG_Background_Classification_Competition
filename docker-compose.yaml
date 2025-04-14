@@ -1,0 +1,8 @@
+version: "3.9"
+services:
+    mlflow:
+      image: ubuntu/mlflow:2.1.1_1.0-22.04
+      container_name: tracker_mlflow
+      restart: unless-stopped
+      ports:
+        - "5000:5001"
