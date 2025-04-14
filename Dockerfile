@@ -1,31 +1,27 @@
-FROM ubuntu:25.04
+FROM python:3.12-bookworm
 
-RUN apt-get update && apt-get install -y \
-    python3 \
-    python3-pip \
-    python3-dev \
-    build-essential \
-    libssl-dev \
-    libffi-dev \
-    python3-setuptools
+WORKDIR /usr/src/app
 
-# create a virtual environment
-RUN python3 -m venv /opt/venv
-ENV PATH="/opt/venv/bin:$PATH"
-# set the working directory
-WORKDIR /app
-# copy the requirements file
+# Install necessary system packages
+RUN apt-get update && apt-get install -y wget unzip
+
+# Copy requirements
 COPY requirements.txt .
-# activate virtual environment
-RUN . /opt/venv/bin/activate
-# install the requirements
-RUN pip install --upgrade pip && \
-    pip install -r requirements.txt
 
-RUN curl https://zenodo.org/records/6587973/files/EDF_format.zip?download=1 -o data/EDF_format.zip && \
-    unzip data/EDF_format.zip -d data/ && \
-    rm data/EDF_format.zip
+# Set up virtual environment and install dependencies
+RUN python -m venv /venv && \
+    /venv/bin/pip install --upgrade pip && \
+    /venv/bin/pip install -r requirements.txt
 
-RUN curl https://zenodo.org/records/6587973/files/eeg_grades.csv?download=1 -o data/eeg_grades.csv
+# Copy application files
+COPY ./app ./app
 
-COPY . .
+# Download data if not present (in entrypoint)
+COPY entrypoint.sh .
+RUN chmod +x entrypoint.sh
+
+# Add venv activation to .bashrc for automatic shell activation
+RUN echo 'source /venv/bin/activate' >> /root/.bashrc
+
+ENTRYPOINT ["./entrypoint.sh"]
+CMD ["sleep", "infinity"]

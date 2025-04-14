@@ -1,0 +1,7 @@
+Implement modular ML pipeline with CV, SMOTE, feature selection, and hyperparameter tuning
+
+- Added CLI flags to control pipeline components: scaler (-s), SMOTE augmentation (-a), and feature selection (-fs)
+- Wrapped preprocessing steps in an imblearn pipeline to prevent data leakage
+- Integrated BayesSearchCV for model-specific hyperparameter tuning within each CV fold
+- Ensured all transformations (scaling, augmentation, feature selection) are done inside CV to avoid leakage
+- Logged model metrics and artifacts to MLflow, including fold-wise models with inferred signatures and input examples

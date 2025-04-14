@@ -1,8 +1,24 @@
-version: "3.9"
+version: '3.9'
+
 services:
-    mlflow:
-      image: ubuntu/mlflow:2.1.1_1.0-22.04
-      container_name: tracker_mlflow
-      restart: unless-stopped
-      ports:
-        - "5000:5001"
+  mlflow:
+    image: ghcr.io/mlflow/mlflow
+    container_name: mlflow-server
+    ports:
+      - "5001:5001"
+    command: mlflow server --host 0.0.0.0 --port 5001 --backend-store-uri sqlite:///mlflow.db --default-artifact-root ./mlruns
+    volumes:
+      - mlflow-data:/mlruns
+
+  app:
+    build: .
+    container_name: eeg-ml-app
+    volumes:
+      - ./app:/usr/src/app/app
+    depends_on:
+      - mlflow
+    environment:
+      MLFLOW_TRACKING_URI: http://mlflow:5001
+
+volumes:
+  mlflow-data:

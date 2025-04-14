@@ -1,5 +1,11 @@
-mne
+mlflow
 pandas
-scipy
-antropy
+numpy
 scikit-learn
+xgboost
+mne
+antropy
+scipy
+tqdm
+imbalanced-learn
+scikit-optimize

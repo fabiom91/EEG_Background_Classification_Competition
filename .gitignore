@@ -177,3 +177,5 @@ app/data/*.zip
 app/data/*.tar.gz
 app/data/*.csv
 app/data/*.edf
+app/data/*/*.edf
+app/data/*/*.csv
