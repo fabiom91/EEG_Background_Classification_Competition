@@ -15,6 +15,7 @@ from imblearn.pipeline import Pipeline
 from imblearn.over_sampling import SMOTE
 from skopt import BayesSearchCV
 from skopt.space import Real, Integer
+from sklearn.base import clone
 
 def build_pipeline(model_name, use_scaler, use_feature_selection, use_augmentation):
     steps = []
@@ -56,7 +57,6 @@ def build_pipeline(model_name, use_scaler, use_feature_selection, use_augmentati
 
     return pipeline, search_space
 
-
 def evaluate_model_cv(model_name, X, y, num_classes, n_splits=10, use_scaler=False, use_feature_selection=False, use_augmentation=False):
     skf = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=42)
     all_metrics = []
@@ -70,21 +70,20 @@ def evaluate_model_cv(model_name, X, y, num_classes, n_splits=10, use_scaler=Fal
             scorer = make_scorer(matthews_corrcoef, greater_is_better=True)
 
             search = BayesSearchCV(
-                estimator=pipeline,
+                estimator=clone(pipeline),
                 search_spaces=search_space,
                 n_iter=10,
-                cv=3,
-                n_jobs=-1,
+                cv=5,
+                # n_jobs=-1,
                 scoring=scorer,
                 random_state=42,
                 verbose=0
             )
 
+            # Fit on training fold only
             search.fit(X_train, y_train)
             best_model = search.best_estimator_
 
-            # Log the model for this fold as an MLflow artifact.
-            # Take a small sample to use as input example
             example_input = X_test.iloc[:5]
             example_output = best_model.predict(example_input)
             signature = infer_signature(example_input, example_output)
@@ -110,16 +109,16 @@ def evaluate_model_cv(model_name, X, y, num_classes, n_splits=10, use_scaler=Fal
             for key, value in metrics.items():
                 mlflow.log_metric(key, value, step=fold)
 
+            mlflow.log_params({f"fold{fold}_{k}": v for k, v in search.best_params_.items()})
             all_metrics.append(metrics)
 
-        # Log average metrics and best hyperparams
+        # Log mean metrics
         mean_metrics = {
             f"mean_{metric}": np.mean([fold[metric] for fold in all_metrics])
             for metric in all_metrics[0]
         }
 
         mlflow.log_metrics(mean_metrics)
-        mlflow.log_params(search.best_params_)
 
 
 def run_models(data, use_scaler=False, use_feature_selection=False, use_augmentation=False):
